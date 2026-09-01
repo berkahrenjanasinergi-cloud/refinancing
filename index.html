@@ -47,7 +47,7 @@ tr:hover td{background:#16324a55}
 </style>
 </head>
 <body>
-<div id="warnBox" class="warn" style="display:none">⚠️ Aplikasi belum terhubung ke Supabase. Buka file HTML, isi <b>SUPABASE_URL</b> dan <b>SUPABASE_ANON_KEY</b> di bagian atas &lt;script&gt;.</div>
+<div id="warnBox" class="warn" style="display:none">⚠️ Aplikasi belum terhubung ke Supabase.</div>
 
 <div id="authBox" class="card authbox" style="display:none">
   <h1>📡 Radar Refinancing & Dana Tunai</h1><p class="sub">Kandidat Menuju Lunas</p>
@@ -158,18 +158,18 @@ tr:hover td{background:#16324a55}
 </div></div>
 
 <script>
-// ================== KONFIGURASI SUPABASE — ISI DI SINI ==================
-const SUPABASE_URL='ISI_DENGAN_URL_PROJECT_SUPABASE';
-const SUPABASE_ANON_KEY='ISI_DENGAN_ANON_KEY_SUPABASE';
+// ================== KONFIGURASI SUPABASE (SUDAH TERISI) ==================
+const SUPABASE_URL='https://lzsuyjahxfkboohsvkzt.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_zShRt7--Ju2-DZaZ5scCw_daIkhhNaN';
 // ========================================================================
-const KONFIG_OK=!SUPABASE_URL.startsWith('ISI_')&&!SUPABASE_ANON_KEY.startsWith('ISI_');
-if(!KONFIG_OK)$('warnBox').style.display='block';
-const sb=KONFIG_OK?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
-const STATUSES=['Baru','Dihubungi','Minat','Proses Kredit','Akad / Eksekusi','Ditolak','Tidak Respon'];
-let KONTRAK=[],STATUS={},UPLOAD_TERAKHIR=null,USER=null,SORT={key:null,dir:1},SIMD=null,rtTimer=null;
 const $=id=>document.getElementById(id);
 const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n||0);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KONFIG_OK=!SUPABASE_URL.startsWith('ISI_')&&!SUPABASE_ANON_KEY.startsWith('ISI_');
+if(!KONFIG_OK)$('warnBox').style.display='block';
+const sb=(KONFIG_OK&&window.supabase)?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+const STATUSES=['Baru','Dihubungi','Minat','Proses Kredit','Akad / Eksekusi','Ditolak','Tidak Respon'];
+let KONTRAK=[],STATUS={},UPLOAD_TERAKHIR=null,USER=null,SORT={key:null,dir:1},SIMD=null,rtTimer=null;
 
 // ================== AUTH ==================
 function toggleForm(f){['login','daftar','reset'].forEach(x=>$('form'+x[0].toUpperCase()+x.slice(1)).style.display=x===f?'block':'none');$('authMsg').textContent='';}
@@ -178,7 +178,7 @@ async function daftar(){const{data,error}=await sb.auth.signUp({email:$('dEmail'
  $('authMsg').textContent=error?('Gagal: '+error.message):(data.session?'Akun dibuat! Silakan masuk.':'Akun dibuat. Cek email untuk konfirmasi, lalu masuk.');}
 async function resetPass(){const{error}=await sb.auth.resetPasswordForEmail($('rEmail').value.trim(),{redirectTo:location.origin});$('authMsg').textContent=error?('Gagal: '+error.message):'Tautan reset dikirim ke email Anda.';}
 async function keluar(){await sb.auth.signOut();}
-if(KONFIG_OK)sb.auth.onAuthStateChange((ev,session)=>{USER=session?.user||null;
+if(sb)sb.auth.onAuthStateChange((ev,session)=>{USER=session?.user||null;
  if(USER){$('authBox').style.display='none';$('appBox').style.display='block';$('userLabel').textContent=USER.email;muatData();pasangRealtime();}
  else{$('authBox').style.display='block';$('appBox').style.display='none';}});
 
@@ -335,9 +335,5 @@ function exportCSV(){const rows=getFiltered();if(!rows.length){alert('Tidak ada 
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='kandidat_refinancing.csv';a.click();}
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))tutupModal();});
 </script>
-// ================== KONFIGURASI SUPABASE — ISI DI SINI ==================
-const SUPABASE_URL='https://lzsuyjahxfkboohsvkzt.supabase.co';
-const SUPABASE_ANON_KEY='sb_publishable_zShRt7--_Ju2-DZaZ5scCw_daIkhhaN';
-// ========================================================================
 </body>
 </html>
